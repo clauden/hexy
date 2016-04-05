@@ -114,7 +114,8 @@ class ControlProxy(object):
     # invocable methods (from external request)
     #
 
-    def move(self, params=None):
+    def move(self, params):
+        moveName = params['name'] if 'name' in params else 'Unknown'
         Util.writeAndSendNote("RunMove", "%s"%(moveName), "robot")
                        
     def disable(self, params=None):
@@ -135,7 +136,7 @@ class ControlProxy(object):
     def connect(self, params):
         Util.writeAndSendNote("RequestConnectPort", params['port'],"controller")
 
-    def ports(self):
+    def ports(self, params=None):
         Util.writeAndSendNote("RequestPortList","","controller")
 
 
@@ -152,14 +153,17 @@ def makeHandlerClass(something):
             print "got path " + self.path
             try:
               # pick off the verb and arguments
-              parsed = urlparse.urlparse(self.path).path
+              parsed = urlparse.urlparse(self.path)
               print parsed
 
-              action = parsed[1:]
+              action = parsed.path[1:]
               print "action: " + action
+  
+              params = urlparse.parse_qs(parsed.query)
+              print params
 
-              # this is fancier than necessary, to invoke new method names just in case
-              getattr(self.proxy, "runMove")(self.path[1:])
+              getattr(self.proxy, action)(params)
+
             except AttributeError as ae:
               print ae
               self.send_response(500)

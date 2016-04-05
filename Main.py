@@ -1,8 +1,7 @@
-import GUI
-import wx
 import threading, os, sys, multiprocessing, Queue
 import time
 import PoMoCoModule
+from ControlProxy import ControlProxy
 
 sys.path.append('Robots/Hexy V1/Moves')
 sys.path.append('Robots/Hexy V1/')
@@ -13,7 +12,7 @@ import robot
 import SerialComms
 import Servotor32
 
-class GUIProcess(PoMoCoModule.Node):
+class ControlProxyProc(PoMoCoModule.Node):
     def __del__():
         if self.ser:
             if self.ser.isOpen():
@@ -23,11 +22,11 @@ class GUIProcess(PoMoCoModule.Node):
         if self.ser and self.ser.isOpen():
             self.ser.close()
          
-    def __init__(self, GUI):
-        super(GUIProcess, self).__init__()
+    def __init__(self, controlProxy):
+        super(ControlProxyProc, self).__init__()
         threading.Thread.__init__(self)
-        self.GUI = GUI
-        self.moduleType = 'GUI'
+        self.ControlProxy = controlProxy
+        self.moduleType = 'GUI'       # this is coupled in the move functions...
         PoMoCoModule.Node.modules[self.moduleType] = self.inNoteQueue
         self.start()
 
@@ -40,14 +39,17 @@ class GUIProcess(PoMoCoModule.Node):
                 time.sleep(0) # keeps infinite loop from hogging all the CPU
 
     def processNote(self, note):
-        #print self.moduleType,"Received Note:",note.sender,"->",note.receiver,"-",note.type,":",note.message
+        print self.moduleType,"Received Note:",note.sender,"->",note.receiver,"-",note.type,":",note.message
+
+         # callbacks from onboard controller
+
         if note.type == "SetServoPos":
             num, pos = note.message.split(',')
-            wx.CallAfter(self.GUI.UpdateServoPos, int(num), float(pos))
+            # wx.CallAfter(self.GUI.UpdateServoPos, int(num), float(pos))
             
         if note.type == "SetServoOffset":
             num, offset = note.message.split(',')
-            wx.CallAfter(self.GUI.UpdateServoOffset, int(num), float(offset))
+            # wx.CallAfter(self.GUI.UpdateServoOffset, int(num), float(offset))
             
         if note.type == "SetServoActive":
             num, state = note.message.split(',')
@@ -56,7 +58,7 @@ class GUIProcess(PoMoCoModule.Node):
                 servoState = True
             if state == "inactive":
                 servoState = False
-            wx.CallAfter(self.GUI.UpdateServoActive, int(num), servoState)
+            # wx.CallAfter(self.GUI.UpdateServoActive, int(num), servoState)
             
         if note.type == "SetConnectionState":
             connState = False
@@ -65,22 +67,22 @@ class GUIProcess(PoMoCoModule.Node):
             if note.message == "inactive":
                 connState = False
             self.connectionState = connState
-            wx.CallAfter(self.GUI.UpdateConnectionState, connState)
+            # wx.CallAfter(self.GUI.UpdateConnectionState, connState)
             
         if note.type == "SetPortList":
             portList = note.message.split(',')[:]
-            wx.CallAfter(self.GUI.UpdatePortList, portList)
+            # wx.CallAfter(self.GUI.UpdatePortList, portList)
 
         if note.type == "SetFirmwareV":
             firmwareVersion = note.message
-            wx.CallAfter(self.GUI.UpdateFirmwareVersion, firmwareVersion)
+            # wx.CallAfter(self.GUI.UpdateFirmwareVersion, firmwareVersion)
 
         if note.type == "UpdateArduinoCode":
             arduinoCode = note.message
-            wx.CallAfter(self.GUI.UpdateArduinoCode, arduinoCode)
+            # wx.CallAfter(self.GUI.UpdateArduinoCode, arduinoCode)
+
 
 if __name__ == '__main__':
-    app = wx.App()
     comms = SerialComms.SerialLink()
     controller = Servotor32.Servotor32()
     robot = robot.robot()
@@ -88,17 +90,21 @@ if __name__ == '__main__':
     __builtins__.robot = robot
     __builtins__.move = robot.RunMove
     __builtins__.floor = 60
-    GUI = GUI.MainGui()
-    GUIProc = GUIProcess(GUI)
-    GUI.LoadRobot("Robots/Hexy V1/")
+
+    controlProxy = ControlProxy()
+    print controlProxy
+
+    proxyProc = ControlProxyProc(controlProxy)
+    print proxyProc
+
+    controlProxy.LoadRobot("Robots/Hexy V1/")
     
-    app.MainLoop() # main loop of GUI needs to be executed in main thread, or OSX crashes
-    del GUI
+    controlProxy.Main() 
+
+    del controlProxy
     del robot
     del controller
     del comms
     os._exit(0)
-    #start GUI
-    #have GUI ask serial 
 
     
