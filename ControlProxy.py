@@ -108,6 +108,7 @@ class ControlProxy(object):
         
     def callback(self, params = {}): 
       print "callback type = " + params['type'] if 'type' in params else 'Unknown'
+      print params
 
 
     # 
@@ -115,7 +116,7 @@ class ControlProxy(object):
     #
 
     def move(self, params):
-        moveName = params['name'] if 'name' in params else 'Unknown'
+        moveName = params['name'][0] if 'name' in params else 'Unknown'
         Util.writeAndSendNote("RunMove", "%s"%(moveName), "robot")
                        
     def disable(self, params=None):
@@ -134,7 +135,8 @@ class ControlProxy(object):
         Util.writeAndSendNote("RequestCenterAll", "", "robot")
 
     def connect(self, params):
-        Util.writeAndSendNote("RequestConnectPort", params['port'],"controller")
+        print "attempting connect to '" + params['port'][0] + "'..."
+        Util.writeAndSendNote("RequestConnectPort", params['port'][0],"controller")
 
     def ports(self, params=None):
         Util.writeAndSendNote("RequestPortList","","controller")

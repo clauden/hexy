@@ -45,10 +45,12 @@ class ControlProxyProc(PoMoCoModule.Node):
 
         if note.type == "SetServoPos":
             num, pos = note.message.split(',')
+            controlProxy.callback( {'type':note.type, 'num':num, 'pos':pos} )
             # wx.CallAfter(self.GUI.UpdateServoPos, int(num), float(pos))
             
         if note.type == "SetServoOffset":
             num, offset = note.message.split(',')
+            controlProxy.callback( {'type':note.type, 'num':num, 'pos':offset} )
             # wx.CallAfter(self.GUI.UpdateServoOffset, int(num), float(offset))
             
         if note.type == "SetServoActive":
@@ -58,6 +60,7 @@ class ControlProxyProc(PoMoCoModule.Node):
                 servoState = True
             if state == "inactive":
                 servoState = False
+            controlProxy.callback( {'type':note.type, 'num':num, 'state':state} )
             # wx.CallAfter(self.GUI.UpdateServoActive, int(num), servoState)
             
         if note.type == "SetConnectionState":
@@ -67,18 +70,22 @@ class ControlProxyProc(PoMoCoModule.Node):
             if note.message == "inactive":
                 connState = False
             self.connectionState = connState
+            controlProxy.callback( {'type':note.type, 'state':note.message} )
             # wx.CallAfter(self.GUI.UpdateConnectionState, connState)
             
         if note.type == "SetPortList":
             portList = note.message.split(',')[:]
+            controlProxy.callback( {'type':note.type, 'portlist':portList} )
             # wx.CallAfter(self.GUI.UpdatePortList, portList)
 
         if note.type == "SetFirmwareV":
             firmwareVersion = note.message
+            controlProxy.callback( {'type':note.type, 'version':note.message} )
             # wx.CallAfter(self.GUI.UpdateFirmwareVersion, firmwareVersion)
 
         if note.type == "UpdateArduinoCode":
             arduinoCode = note.message
+            controlProxy.callback( {'type':note.type, 'code':note.message} )
             # wx.CallAfter(self.GUI.UpdateArduinoCode, arduinoCode)
 
 

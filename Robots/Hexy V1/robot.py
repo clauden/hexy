@@ -177,14 +177,16 @@ class robot(PoMoCoModule.Node):
 
         if note.type == "RunMove":
             moveName = note.message[:]  # copy the move name locally
-            print "running", moveName
+            print "running move", moveName
             self.RunMove(moveName)
 
     def RunMove(self, moveName):
         moveName = moveName.replace(' ', '')
         if moveName in sys.modules:
+            print "loading move ", moveName
             reload(sys.modules[moveName])
         else:
+            print "importing move ", moveName
             __import__(moveName)
 
 
@@ -194,6 +196,7 @@ class neck():
         self.parent = parent
 
     def set(self, deg):
+        print "setting neck", deg
         self.servo.SetDeg(deg)
 
 

@@ -237,6 +237,8 @@ class SerialLink(PoMoCoModule.Node):
             self.ser = None
         except:
             print "Connection failed:",portName,",",sys.exc_info()
+            import traceback
+            traceback.print_exc()
             self.ser = None
             
 
