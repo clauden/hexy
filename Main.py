@@ -94,7 +94,11 @@ class ControlProxyProc(PoMoCoModule.Node):
             # wx.CallAfter(self.GUI.UpdateArduinoCode, arduinoCode)
 
 
+port = '/dev/cu.ArcBotics-DevB'
+
 if __name__ == '__main__':
+    if len(sys.argv) > 1:
+      port = sys.argv[1] 
     comms = SerialComms.SerialLink()
     controller = Servotor32.Servotor32()
     robot = robot.robot()
@@ -109,8 +113,11 @@ if __name__ == '__main__':
     proxyProc = ControlProxyProc(controlProxy)
     print proxyProc
 
-    
     controlProxy.LoadRobot("Robots/Hexy_V1/")
+    print "invoking connect..."
+    controlProxy.connect_direct(port)
+    print "returned from connect"
+
     controlProxy.Main() 
 
     del controlProxy
@@ -119,4 +126,3 @@ if __name__ == '__main__':
     del comms
     os._exit(0)
 
-    

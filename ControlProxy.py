@@ -107,8 +107,14 @@ class ControlProxy(object):
             self.servos.append(ServoControl(self, num, pos, deg, offset, visible, active, joint))
         
     def callback(self, params = {}): 
-      print "callback type = " + params['type'] if 'type' in params else 'Unknown'
-      print params
+      if 'type' in params:
+        if params['type'].find('Servo'):
+          print '.',
+        else:
+          print 'callback type = ', params['type']
+          print params
+      else:
+        print "Unknown"
 
 
     # 
@@ -137,6 +143,10 @@ class ControlProxy(object):
     def connect(self, params):
         print "attempting connect to '" + params['port'][0] + "'..."
         Util.writeAndSendNote("RequestConnectPort", params['port'][0],"controller")
+
+    def connect_direct(self, port):
+        print "attempting connect to '" + port
+        Util.writeAndSendNote("RequestConnectPort", port,"controller")
 
     def ports(self, params=None):
         Util.writeAndSendNote("RequestPortList","","controller")
