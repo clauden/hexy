@@ -40,9 +40,13 @@ class ControlProxyProc(PoMoCoModule.Node):
                 time.sleep(0) # keeps infinite loop from hogging all the CPU
 
     def processNote(self, note):
-        print self.moduleType,"Received Note:",note.sender,"->",note.receiver,"-",note.type,":",note.message
 
-         # callbacks from onboard controller
+        if note.type.find('Servo'):
+          print '-',
+        else:
+          print self.moduleType, "Received Note:", note.sender, "->", note.receiver, "-", note.type, ":", note.message
+
+        # callbacks from onboard controller
 
         if note.type == "SetServoPos":
             num, pos = note.message.split(',')
