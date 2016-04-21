@@ -1,10 +1,11 @@
 import threading, os, sys, multiprocessing, Queue
 import time
 import PoMoCoModule
+# import Log
 from ControlProxy import ControlProxy
 
-sys.path.append('Robots/Hexy V1/Moves')
-sys.path.append('Robots/Hexy V1/')
+sys.path.append('Robots/Hexy_V1/Moves')
+sys.path.append('Robots/Hexy_V1/')
 sys.path.append('Comms')
 sys.path.append('Controllers')
 
@@ -104,8 +105,8 @@ if __name__ == '__main__':
     proxyProc = ControlProxyProc(controlProxy)
     print proxyProc
 
-    controlProxy.LoadRobot("Robots/Hexy V1/")
     
+    controlProxy.LoadRobot("Robots/Hexy_V1/")
     controlProxy.Main() 
 
     del controlProxy

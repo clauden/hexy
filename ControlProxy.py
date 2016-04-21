@@ -14,7 +14,7 @@ else:
 
 #naughty magic constants
 ROBOTS_FOLDER_PATH = "Robots/"
-ROBOT_FOLDER_PATH = "Robots/Hexy V1/"
+ROBOT_FOLDER_PATH = "Robots/Hexy_V1/"
 
 
 # def sendNote(note):
